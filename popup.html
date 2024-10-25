@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.221.0/lucide-icons.min.css">
+</head>
+<body>
+  <h3>Word Highlighter</h3>
+  
+  <div class="stats-container">
+    <div>Total found: <span class="total-count" id="totalCount">0</span></div>
+    <!-- <div class="current-position" id="currentPosition">0 / 0</div> -->
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="wordInput" placeholder="Enter a word">
+    <button id="addButton">Add</button>
+  </div>
+  
+  <div class="word-list" id="wordList">
+    <!-- Words will be added here -->
+  </div>
+  
+  <div class="navigation-buttons">
+    <button id="prevButton">Previous</button>
+    <button id="nextButton">Next</button>
+  </div>
+
+  <div class="settings-container">
+    <span>Dark Mode</span>
+    <label class="switch">
+      <input type="checkbox" id="darkModeToggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

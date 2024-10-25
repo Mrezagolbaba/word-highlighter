@@ -1,0 +1,26 @@
+{
+    "manifest_version": 2,
+    "name": "Word Highlighter",
+    "version": "1.0",
+    "description": "Highlights specified words on web pages",
+    "permissions": [
+        "activeTab",
+        "storage"
+    ],
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "web_accessible_resources": [
+        "styles.css"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}

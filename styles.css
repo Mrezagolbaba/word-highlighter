@@ -1,0 +1,264 @@
+body {
+  width: 300px;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+
+.input-container {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+input[type="text"] {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.word-list {
+  max-height: 150px;
+  overflow-y: auto;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.word-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  margin: 4px 0;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+}
+
+.word-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.word-text {
+  font-weight: 500;
+}
+
+.word-count {
+  background-color: #2196F3;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.delete-btn {
+  color: #ff4444;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ff4444;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background-color: rgba(255, 68, 68, 0.1);
+    transform: scale(1.1);
+}
+
+.delete-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dark mode support */
+.dark-mode .delete-btn {
+    color: #ff6666;
+}
+
+.dark-mode .delete-btn:hover {
+    background-color: rgba(255, 102, 102, 0.2);
+}
+
+.word-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin: 4px 0;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.word-item:hover {
+    background-color: #eeeeee;
+}
+
+.dark-mode .word-item:hover {
+    background-color: #444;
+}
+
+.stats-container {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-count {
+  font-weight: bold;
+  color: #2196F3;
+}
+
+.current-position {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.navigation-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.navigation-buttons button {
+  flex: 1;
+  padding: 8px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.navigation-buttons button:hover {
+  background-color: #1976D2;
+}
+
+.settings-container {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Switch styling */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Dark mode styles */
+.dark-mode {
+  background-color: #222;
+  color: #fff;
+}
+
+.dark-mode input[type="text"] {
+  background-color: #333;
+  color: #fff;
+  border-color: #444;
+}
+
+.dark-mode .word-item {
+  background-color: #333;
+}
+
+.dark-mode .word-count {
+  background-color: #1976D2;
+}
+
+.dark-mode .stats-container {
+  background-color: #333;
+}
+
+.dark-mode .current-position {
+  color: #aaa;
+}
+
+.dark-mode .settings-container {
+  border-top-color: #444;
+}
+
+.dark-mode .navigation-buttons button {
+  background-color: #1976D2;
+}
+
+.dark-mode .navigation-buttons button:hover {
+  background-color: #1565C0;
+}
