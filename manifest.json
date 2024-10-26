@@ -11,7 +11,7 @@
         "default_popup": "popup.html"
     },
     "web_accessible_resources": [
-        "styles.css"
+        "src/css/styles.css"
     ],
     "content_scripts": [
         {
@@ -19,7 +19,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "content.js"
+                "src/js/content.js"
             ]
         }
     ]
