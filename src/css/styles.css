@@ -56,45 +56,40 @@ input[type="text"] {
   min-width: 20px;
   text-align: center;
 }
-
+/*                           delete button                               */
 .delete-btn {
+  background: none;
+  border: none;
   color: #ff4444;
   cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-.delete-btn {
-    background: none;
-    border: none;
-    color: #ff4444;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .delete-btn:hover {
-    background-color: rgba(255, 68, 68, 0.1);
-    transform: scale(1.1);
+  background-color: rgba(255, 68, 68, 0.1);
+  transform: scale(1.1);
 }
 
-.delete-btn i {
-    width: 16px;
-    height: 16px;
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
 }
 
 /* Dark mode support */
 .dark-mode .delete-btn {
-    color: #ff6666;
+  color: #ff6666;
 }
 
 .dark-mode .delete-btn:hover {
-    background-color: rgba(255, 102, 102, 0.2);
+  background-color: rgba(255, 102, 102, 0.2);
 }
-
+/*                           delete button                               */
 .word-item {
     display: flex;
     justify-content: space-between;
