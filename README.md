@@ -1,7 +1,7 @@
 <h1 align="center">Word Highlighter Chrome Extension</h1>
 
 <p align="center">
-  <img src="/Images/high.png" alt="Word Highlighter Logo" width="128" height="128"/>
+  <img src="/Images/Logo.webp" alt="Word Highlighter Logo" width="128" height="128"/>
 </p>
 
 <p align="center">
@@ -86,7 +86,9 @@ code .
 ```bash
 
 src/
-├── images/         # Extension icons
+├── assets/
+├── ├──icons       # Extension icons
+├── ├── images     # Extension images
 ├── js/            # JavaScript files
 ├── css/           # Stylesheets
 ├── popup.html     # Extension popup
