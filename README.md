@@ -109,7 +109,7 @@ src/
 </p>
 <h2>👥 Authors</h2>
 <ul>
-  <li>Mohamadreza Golbaba - Initial work - <a href="https://github.com/Mrezagolbaba">YourGitHub</a></li>
+  <li>Mohamadreza Golbaba - Initial work - <a href="https://github.com/Mrezagolbaba">GitHub</a></li>
 </ul>
 <h2>🙏 Acknowledgments</h2>
 <ul>
