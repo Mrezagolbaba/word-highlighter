@@ -1,12 +1,12 @@
 <h1 align="center">Word Highlighter Chrome Extension</h1>
 
 <p align="center">
-  <img src="/Images/Logo.webp" alt="Word Highlighter Logo" width="128" height="128"/>
+  <img src="assets/images/Logo.webp" alt="Word Highlighter Logo" width="128" height="128"/>
 </p>
 
 <p align="center">
   <a href="https://github.com/Mrezagolbaba/word-highlighter/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/yourusername/word-highlighter" alt="License"/>
+    <img src="https://img.shields.io/github/license/Mrezagolbaba/word-highlighter" alt="License"/>
   </a>
   <a href="https://github.com/Mrezagolbaba/word-highlighter/stargazers">
     <img src="https://img.shields.io/github/stars/Mrezagolbaba/word-highlighter" alt="Stars"/>
@@ -51,6 +51,14 @@
   <li>Select the <code>src</code> directory from the downloaded/cloned repository</li>
 </ol>
 
+<h2>📸 Screenshots</h2>
+
+<p align="center">
+  <img src="assets/images/Screenshot1.png" alt="Word Highlighter in Action" width="600"/>
+  <br>
+  <em>Word Highlighter working on LinkedIn with colorful highlights</em>
+</p>
+
 <h2>🚀 Usage</h2>
 <ol>
   <li>Click the extension icon in Chrome toolbar</li>
@@ -73,7 +81,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/word-highlighter.git
+git clone https://github.com/Mrezagolbaba/word-highlighter.git
 
 # Navigate to project directory
 cd word-highlighter
@@ -83,17 +91,36 @@ code .
 ```
 <h3>Project Structure</h3>
 
-```bash
-
-src/
-├── assets/
-├── ├──icons       # Extension icons
-├── ├── images     # Extension images
-├── js/            # JavaScript files
-├── css/           # Stylesheets
-├── popup.html     # Extension popup
-└── manifest.json  # Extension manifest
 ```
+word-highlighter/
+├── assets/
+│   ├── icons/         # Extension icons (16px, 32px, 48px, 128px)
+│   └── images/        # Logo and screenshots
+├── src/
+│   ├── js/           # JavaScript modules (modular architecture)
+│   │   ├── colors.js     # Color management and themes (39 lines)
+│   │   ├── highlighter.js # Core highlighting logic (120 lines)
+│   │   ├── navigation.js  # Highlight navigation controls (72 lines)
+│   │   ├── linkedin.js    # LinkedIn-specific functionality (45 lines)
+│   │   ├── main.js        # Main initialization and events (135 lines)
+│   │   └── popup.js       # Popup interface logic
+│   └── css/          # Stylesheets
+│       └── styles.css     # Main styles for popup
+├── docs/             # GitHub Pages documentation
+│   └── index.html    # Documentation website
+├── popup.html        # Extension popup interface
+├── manifest.json     # Extension manifest (V3)
+├── PERFORMANCE_NOTES.md # Performance optimization details
+└── README.md         # This file
+```
+
+<h3>Module Overview</h3>
+
+- **🎨 colors.js**: Manages vibrant color palettes for light/dark modes with 10 distinct colors per word
+- **🔍 highlighter.js**: Core text highlighting with performance optimizations and hidden content detection
+- **🧭 navigation.js**: Previous/Next navigation with smooth scrolling and visual indicators
+- **💼 linkedin.js**: Specialized functions for LinkedIn's dynamic content and collapsed job ads
+- **⚙️ main.js**: Orchestrates all modules, handles events, and manages extension lifecycle
 <h2>🤝 Contributing</h2>
 <ol>
   <li>Fork the repository</li>
