@@ -1,4 +1,70 @@
 let highlightedWords = [];
+
+function fixHiddenHighlight(span) {
+    const computedStyle = window.getComputedStyle(span);
+    
+    const isHidden = computedStyle.opacity === '0' || 
+                    computedStyle.visibility === 'hidden' ||
+                    computedStyle.display === 'none';
+    
+    const backgroundColor = computedStyle.backgroundColor;
+    
+    if (isHidden || backgroundColor === 'rgba(0, 0, 0, 0)' || backgroundColor === 'transparent') {
+      
+        span.style.opacity = '1';
+        span.style.visibility = 'visible';
+        span.style.display = 'inline';
+        span.style.border = '1px solid rgba(0,0,0,0.3)';
+        span.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+        
+        // Make sure the background color is applied
+        const wordIndex = highlightedWords.indexOf(span.dataset.word);
+        span.style.backgroundColor = getColorForWord(span.dataset.word, wordIndex) + ' !important';
+    }
+}
+
+function expandCollapsedContent() {
+    const expandSelectors = [
+        '[aria-expanded="false"]',
+        '.job-card-container--clickable',
+        '.job-card-list__entity-lockup',
+        '.jobs-job-board-list__item',
+        '.ember-application .jobs-search-results-list',
+        '.jobs-search-box__container',
+        '.jobs-details',
+        '.jobs-unified-top-card'
+    ];
+    
+    expandSelectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(element => {
+            if (element.getAttribute('aria-expanded') === 'false') {
+                element.style.maxHeight = 'none';
+                element.style.overflow = 'visible';
+                element.setAttribute('aria-expanded', 'true');
+            }
+            
+            const showMoreBtn = element.querySelector('[aria-label*="Show more"], [aria-label*="show more"], .jobs-description-details__show-more-button');
+            if (showMoreBtn && showMoreBtn.style.display !== 'none') {
+                showMoreBtn.click();
+            }
+        });
+    });
+}
+
+window.debugWordHighlighter = function() {
+    console.log('=== Word Highlighter Debug Info ===');
+    console.log('Current words:', highlightedWords);
+    console.log('All highlights found:', allHighlights.length);
+    console.log('Page text sample:', document.body.innerText.substring(0, 500));
+    console.log('LinkedIn content elements:');
+    const linkedinSelectors = ['[role="main"]', '.core-rail', '.feed-container-theme', '.scaffold-layout__main', '.application-outlet', '.feed-container'];
+    linkedinSelectors.forEach(selector => {
+        const el = document.querySelector(selector);
+        console.log(selector + ':', el ? 'Found' : 'Not found');
+    });
+    
+    console.log('Collapsed elements:', document.querySelectorAll('[aria-expanded="false"]').length);
+};
 let currentHighlightIndex = -1;
 let allHighlights = [];
 let observer;
@@ -6,21 +72,51 @@ let isDarkMode = false;
 let scrollTimeout;
 let lastUrl = location.href;
 
+const colorPalette = [
+    '#FFD700', // Gold
+    '#FF6B6B', // Coral red
+    '#4ECDC4', // Teal
+    '#45B7D1', // Sky blue
+    '#32CD32', // Lime green
+    '#FF8C00', // Dark orange
+    '#DA70D6', // Orchid
+    '#00CED1', // Dark turquoise
+    '#FFB347', // Peach
+    '#9370DB'  // Medium purple
+];
+
+const darkColorPalette = [
+    '#F39C12', // Orange
+    '#E74C3C', // Red
+    '#1ABC9C', // Turquoise
+    '#3498DB', // Blue
+    '#2ECC71', // Green
+    '#F1C40F', // Yellow
+    '#9B59B6', // Purple
+    '#E67E22', // Dark orange
+    '#16A085', // Dark turquoise
+    '#8E44AD'  // Dark purple
+];
+
 function getHighlightColors() {
-    return isDarkMode ? {
-        normal: '#10b981',  // Subdued yellow for dark mode
-        current: '#8b5cf6'   // Subdued orange for dark mode
-    } : {
-        normal: '#10b981',
-        current: '#8b5cf6'  // Orange
+    const palette = isDarkMode ? darkColorPalette : colorPalette;
+    return {
+        normal: palette,
+        current: isDarkMode ? '#FF6B35' : '#FF4757' 
     };
+}
+
+function getColorForWord(word, index) {
+    const colors = getHighlightColors();
+    return colors.normal[index % colors.normal.length];
 }
 
 function countWords(words) {
     const counts = {};
     words.forEach(word => {
         if (word.trim().length === 0) return;
-        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b${escapedWord}\\b`, 'gi');
         const text = document.body.innerText;
         const matches = text.match(regex);
         counts[word] = matches ? matches.length : 0;
@@ -36,11 +132,8 @@ function countWords(words) {
 }
 
 function highlightWords(words, newContent = document.body) {
-    const colors = getHighlightColors();
 
-    // If highlighting new content, don't clear existing highlights
     if (newContent === document.body) {
-        // Remove existing highlights only when scanning entire page
         const highlights = document.querySelectorAll('.extension-highlight');
         highlights.forEach(highlight => {
             const parent = highlight.parentNode;
@@ -54,18 +147,22 @@ function highlightWords(words, newContent = document.body) {
     words.forEach(word => {
         if (word.trim().length === 0) return;
 
-        // Use word boundary in regex to match whole words only
-        const regex = new RegExp(`\\b(${word})\\b`, 'gi');
+        
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
         const walker = document.createTreeWalker(
             newContent,
             NodeFilter.SHOW_TEXT,
             {
                 acceptNode: function (node) {
-                    // Skip if parent is already highlighted or is a script/style
-                    if (node.parentNode.classList?.contains('extension-highlight') ||
-                        ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT'].includes(node.parentNode.tagName)) {
+                    const parent = node.parentNode;
+                    if (!parent || 
+                        parent.classList?.contains('extension-highlight') ||
+                        ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT', 'NOSCRIPT', 'HEAD'].includes(parent.tagName) ||
+                        node.textContent.trim().length === 0) {
                         return NodeFilter.FILTER_REJECT;
                     }
+                    
                     return NodeFilter.FILTER_ACCEPT;
                 }
             },
@@ -77,10 +174,14 @@ function highlightWords(words, newContent = document.body) {
         while (node = walker.nextNode()) {
             nodes.push(node);
         }
+        
+        let matchCount = 0;
 
         nodes.forEach(node => {
             const content = node.textContent;
             if (content.match(regex)) {
+                matchCount++;
+                
                 const fragment = document.createDocumentFragment();
                 const parts = content.split(regex);
 
@@ -88,8 +189,21 @@ function highlightWords(words, newContent = document.body) {
                     if (i % 2 === 1) {  // This is a match
                         const span = document.createElement('span');
                         span.className = 'extension-highlight';
-                        span.style.backgroundColor = colors.normal;
+                        const wordIndex = highlightedWords.indexOf(word);
+                        span.style.backgroundColor = getColorForWord(word, wordIndex);
+                        span.style.color = '#000';
+                        span.style.fontWeight = '500'; 
+                        span.style.padding = '1px 2px';
+                        span.style.borderRadius = '3px';
+                        span.style.position = 'relative';
+                        span.style.zIndex = '1000'; 
+                        span.dataset.word = word;
                         span.textContent = part;
+                        
+                        setTimeout(() => {
+                            fixHiddenHighlight(span);
+                        }, 0);
+                        
                         fragment.appendChild(span);
                         allHighlights.push(span);
                     } else {
@@ -100,12 +214,11 @@ function highlightWords(words, newContent = document.body) {
                 node.parentNode.replaceChild(fragment, node);
             }
         });
+        
     });
 
-    // Count words and update popup
     countWords(words);
 
-    // Update current/total in popup
     if (allHighlights.length > 0) {
         chrome.runtime.sendMessage({
             action: 'updatePosition',
@@ -120,37 +233,31 @@ function findNext() {
     
     const colors = getHighlightColors();
     
-    // Remove focus from previous highlight
     if (currentHighlightIndex >= 0) {
         allHighlights[currentHighlightIndex].style.backgroundColor = colors.normal;
         const oldIndicator = allHighlights[currentHighlightIndex].querySelector('.highlight-indicator');
         if (oldIndicator) oldIndicator.remove();
     }
 
-    // Move to next highlight
     if (currentHighlightIndex >= allHighlights.length - 1) {
-        currentHighlightIndex = 0; // Reset to beginning if at end
+        currentHighlightIndex = 0; 
     } else {
-        currentHighlightIndex++; // Move to next
+        currentHighlightIndex++; 
     }
     
-    // Focus on new highlight
     const highlight = allHighlights[currentHighlightIndex];
     highlight.style.backgroundColor = colors.current;
 
-    // Add position indicator
     const indicator = document.createElement('div');
     indicator.className = 'highlight-indicator';
     highlight.appendChild(indicator);
 
-    // Scroll to the highlight
     highlight.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'nearest'
     });
 
-    // Update position in popup
     chrome.runtime.sendMessage({
         action: 'updatePosition',
         current: currentHighlightIndex + 1,
@@ -162,14 +269,12 @@ function findPrev() {
     
     const colors = getHighlightColors();
     
-    // Remove focus from previous highlight
     if (currentHighlightIndex >= 0) {
         allHighlights[currentHighlightIndex].style.backgroundColor = colors.normal;
         const oldIndicator = allHighlights[currentHighlightIndex].querySelector('.highlight-indicator');
         if (oldIndicator) oldIndicator.remove();
     }
 
-    // Move to previous highlight
     if (currentHighlightIndex <= 0) {
         currentHighlightIndex = allHighlights.length - 1; // Go to end if at beginning
     } else {
@@ -185,14 +290,12 @@ function findPrev() {
     indicator.className = 'highlight-indicator';
     highlight.appendChild(indicator);
 
-    // Scroll to the highlight
     highlight.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'nearest'
     });
 
-    // Update position in popup
     chrome.runtime.sendMessage({
         action: 'updatePosition',
         current: currentHighlightIndex + 1,
@@ -200,12 +303,16 @@ function findPrev() {
     });
 }
 
-// Update your message listener in content.js
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request) {
     switch(request.action) {
         case 'updateHighlights':
             highlightedWords = request.words;
-            highlightWords(highlightedWords);
+            if (window.location.hostname.includes('linkedin.com')) {
+                expandCollapsedContent();
+                setTimeout(() => highlightWords(highlightedWords), 100);
+            } else {
+                highlightWords(highlightedWords);
+            }
             break;
         case 'findNext':
             findNext();
@@ -219,42 +326,42 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
-// Add these buttons to popup.html navigation-buttons div:
 
 function setupInfiniteScrollObserver() {
-    // Disconnect existing observer if any
     if (observer) {
         observer.disconnect();
     }
 
-    // Configure the observer
+    let mutationTimeout;
     observer = new MutationObserver((mutations) => {
-        let shouldHighlight = false;
+        clearTimeout(mutationTimeout);
+        
+        let hasSignificantChanges = false;
         mutations.forEach((mutation) => {
             if (mutation.addedNodes && mutation.addedNodes.length > 0) {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
-                        shouldHighlight = true;
+                        const textContent = node.textContent || '';
+                        if (textContent.trim().length > 10) { 
+                            hasSignificantChanges = true;
+                        }
                     }
                 });
             }
         });
 
-        if (shouldHighlight && highlightedWords.length > 0) {
-            // Debounce the highlight call
-            clearTimeout(window.highlightDebounce);
-            window.highlightDebounce = setTimeout(() => {
+        if (hasSignificantChanges && highlightedWords.length > 0) {
+            mutationTimeout = setTimeout(() => {
                 highlightWords(highlightedWords);
-            }, 100);
+            }, 200);
         }
     });
 
-    // Start observing with optimized config
     observer.observe(document.body, {
         childList: true,
         subtree: true,
-        characterData: false,
-        attributeFilter: [] // Don't observe attributes
+        characterData: true, 
+        attributeFilter: [] 
     });
 }
 
@@ -271,12 +378,16 @@ function updateDarkMode(darkMode) {
     });
 }
 
-// Listen for messages from popup
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request) {
     switch (request.action) {
         case 'updateHighlights':
             highlightedWords = request.words;
-            highlightWords(highlightedWords);
+            if (window.location.hostname.includes('linkedin.com')) {
+                expandCollapsedContent();
+                setTimeout(() => highlightWords(highlightedWords), 100);
+            } else {
+                highlightWords(highlightedWords);
+            }
             break;
         case 'findNext':
             findNext();
@@ -287,9 +398,48 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 
-// Initialize
-function initialize() {
-    // Load saved settings
+function waitForLinkedInContent() {
+    return new Promise((resolve) => {
+        const checkForContent = () => {
+            const selectors = [
+                '[role="main"]',
+                '.core-rail',
+                '.feed-container-theme',
+                '.scaffold-layout__main',
+                '.application-outlet',
+                '.feed-container'
+            ];
+            
+            const contentElement = selectors.find(selector => document.querySelector(selector));
+            
+            if (contentElement || Date.now() - startTime > 3000) { /
+                resolve();
+            } else {
+                setTimeout(checkForContent, 100);
+            }
+        };
+        
+        const startTime = Date.now();
+        checkForContent();
+    });
+}
+
+async function initialize() {
+    if (window.location.hostname.includes('linkedin.com')) {
+        await waitForLinkedInContent();
+    }
+    
+    if (window.location.hostname.includes('linkedin.com')) {
+        expandCollapsedContent();
+        setTimeout(() => {
+            loadAndHighlight();
+        }, 200);
+    } else {
+        loadAndHighlight();
+    }
+}
+
+function loadAndHighlight() {
     chrome.storage.local.get(['highlightWords', 'darkMode'], function (result) {
         isDarkMode = result.darkMode || false;
         if (result.highlightWords) {
@@ -300,19 +450,31 @@ function initialize() {
 
     setupInfiniteScrollObserver();
 
-    // Handle URL changes for SPAs
+    let urlChangeTimeout;
     new MutationObserver(() => {
         const currentUrl = location.href;
         if (currentUrl !== lastUrl) {
             lastUrl = currentUrl;
-            setTimeout(() => {
-                highlightWords(highlightedWords);
-                setupInfiniteScrollObserver();
-            }, 500);
+            clearTimeout(urlChangeTimeout);
+            
+            const delay = window.location.hostname.includes('linkedin.com') ? 1000 : 500;
+            
+            urlChangeTimeout = setTimeout(() => {
+                const checkContent = () => {
+                    const mainContent = document.querySelector('[role="main"], .core-rail, .feed-container-theme');
+                    if (mainContent || Date.now() - urlChangeStart > 3000) {
+                        highlightWords(highlightedWords);
+                        setupInfiniteScrollObserver();
+                    } else {
+                        setTimeout(checkContent, 100);
+                    }
+                };
+                const urlChangeStart = Date.now();
+                checkContent();
+            }, delay);
         }
     }).observe(document, { subtree: true, childList: true });
 
-    // Handle scrolling
     window.addEventListener('scroll', () => {
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
@@ -323,7 +485,6 @@ function initialize() {
     }, { passive: true });
 }
 
-// Add CSS to head
 const style = document.createElement('style');
 style.textContent = `
     .extension-highlight {
@@ -359,7 +520,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initialize);
 } else {
